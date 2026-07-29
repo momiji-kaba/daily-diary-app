@@ -115,6 +115,10 @@
 <script>
 const STORAGE_PREFIX = 'diary_';
 const SETTINGS_KEY = 'diary_settings';
+// iOSのSafariは一定期間サイトを開かないとlocalStorageごと設定を消去することがあるため、
+// スプレッドシート連携URLはlocalStorage任せにせずここに直接埋め込んでフォールバックにする。
+// (書き込み専用エンドポイントなので漏洩しても既存データの閲覧・改ざんはできない)
+const DEFAULT_GSHEET_URL = 'https://script.google.com/macros/s/AKfycbxIpmL3xnF-IHZ92jQs3l_l9UQcIdh2kdVhyJPg7iAopJ_L8pQObCYxeIPu5BnDbZGhhw/exec';
 
 function todayKey(d){
   const dt = d || new Date();
@@ -346,7 +350,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 
 // ---- Googleスプレッドシート連携(ベストエフォート、失敗してもローカル保存は成立している) ----
 function syncToSheet(dateKey, data){
-  const url = getSettings().gsheetUrl;
+  const url = getSettings().gsheetUrl || DEFAULT_GSHEET_URL;
   if (!url) return;
   const payload = JSON.stringify({date: dateKey, ...data});
   fetch(url, {
@@ -416,11 +420,11 @@ function renderHistory(){
       <div class="switch ${settings.periodEnabled ? 'on':''}" id="periodToggle"><div class="knob"></div></div>
     </div>
     <div class="item" style="margin-top:6px;">
-      <label>Googleスプレッドシート連携URL(任意)</label>
-      <input type="text" id="gsheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
+      <label>Googleスプレッドシート連携URL(未入力ならアプリ組み込みの既定URLを使用)</label>
+      <input type="text" id="gsheetUrlInput" placeholder="${DEFAULT_GSHEET_URL}"
         value="${settings.gsheetUrl ? settings.gsheetUrl.replace(/"/g,'&quot;') : ''}"
         style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:#232838; color:var(--text); font-size:13px;">
-      <div class="section-sub" style="margin-top:8px;">設定すると、保存ボタンを押した際にローカル保存に加えてこのURL(Google Apps Scriptのウェブアプリ)にも自動送信されます。手順は同フォルダの google-apps-script-code.gs を参照してください。</div>
+      <div class="section-sub" style="margin-top:8px;">通常は空欄のままでOKです(アプリに組み込まれた既定のスプレッドシートに自動保存されます)。別のスプレッドシートに切り替えたい場合だけここにURLを入力してください。設定手順は同フォルダの google-apps-script-code.gs を参照。</div>
       <div class="section-sub" id="syncStatus" style="margin-top:6px; color:var(--good);">${settings.lastSyncStatus || '(まだ送信していません)'}</div>
       <button class="export-btn" id="testSyncBtn" style="margin-top:10px;">接続テスト送信</button>
     </div>
