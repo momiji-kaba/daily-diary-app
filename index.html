@@ -36,7 +36,8 @@
   .section-sub{font-size:11px; color:var(--sub); margin-bottom:14px; line-height:1.5;}
   .item{margin-bottom:18px;}
   .item:last-child{margin-bottom:0;}
-  .item label{display:block; font-size:14px; margin-bottom:8px; line-height:1.5;}
+  .item label{display:block; font-size:14px; margin-bottom:4px; line-height:1.5;}
+  .en-original{font-size:11px; color:var(--sub); font-style:italic; margin-bottom:8px; line-height:1.4;}
   .likert{display:flex; gap:6px; justify-content:space-between;}
   .likert button{
     flex:1; aspect-ratio:1; border-radius:50%; border:1px solid var(--line);
@@ -137,69 +138,52 @@ const SECTIONS = [
   {
     id: 'vitality', title: '① 主観的活力', cite: 'Subjective Vitality Scale (Ryan & Frederick, 1997) state版',
     items: [
-      {id:'V1', type:'likert7', label:'今日は活力に満ちていると感じた'},
-      {id:'V2', type:'likert7', label:'今日はエネルギーが湧いていると感じた'},
-      {id:'V3', type:'likert7', label:'今日は生き生きしていると感じた'},
-      {id:'V4', type:'likert7', label:'今日は元気が出なかった', reverse:true},
+      {id:'V1', type:'likert7', label:'今日は活力に満ちていると感じた', en:'At this moment, I feel alive and vital.'},
+      {id:'V2', type:'likert7', label:'今日はエネルギーが湧いていると感じた', en:'I feel energized right now.'},
+      {id:'V3', type:'likert7', label:'今日は生き生きしていると感じた', en:'Currently I feel so alive I just want to burst.'},
+      {id:'V4', type:'likert7', label:'今日は元気が出なかった', reverse:true, en:"I don't feel very energetic right now."},
     ]
   },
   {
-    id: 'affect', title: '② 感情', cite: 'I-PANAS-SF (Thompson, 2007) 日本語訳(独自)',
+    id: 'affect', title: '② 感情', cite: 'I-PANAS-SF (Thompson, 2007) 日本語訳(独自)。英語原文は単語(形容詞)のみ、日本語は「今日は〜と感じた」の文にして提示',
     items: [
-      {id:'P_active', type:'likert7', label:'今日は活発だと感じた'},
-      {id:'P_alert', type:'likert7', label:'今日ははきはきしていた'},
-      {id:'P_attentive', type:'likert7', label:'今日は注意深く物事に取り組めた'},
-      {id:'P_determined', type:'likert7', label:'今日は意志が強く物事に取り組めた'},
-      {id:'P_inspired', type:'likert7', label:'今日は何かひらめきを感じた'},
-      {id:'N_afraid', type:'likert7', label:'今日は怖いと感じた'},
-      {id:'N_ashamed', type:'likert7', label:'今日は恥ずかしいと感じた'},
-      {id:'N_hostile', type:'likert7', label:'今日は敵意を感じた'},
-      {id:'N_nervous', type:'likert7', label:'今日はそわそわして落ち着かなかった'},
-      {id:'N_upset', type:'likert7', label:'今日は動揺することがあった'},
+      {id:'P_active', type:'likert7', label:'今日は活発だと感じた', en:'active'},
+      {id:'P_alert', type:'likert7', label:'今日ははきはきしていた', en:'alert'},
+      {id:'P_attentive', type:'likert7', label:'今日は注意深く物事に取り組めた', en:'attentive'},
+      {id:'P_determined', type:'likert7', label:'今日は意志が強く物事に取り組めた', en:'determined'},
+      {id:'P_inspired', type:'likert7', label:'今日は何かひらめきを感じた', en:'inspired'},
+      {id:'N_afraid', type:'likert7', label:'今日は怖いと感じた', en:'afraid'},
+      {id:'N_ashamed', type:'likert7', label:'今日は恥ずかしいと感じた', en:'ashamed'},
+      {id:'N_hostile', type:'likert7', label:'今日は敵意を感じた', en:'hostile'},
+      {id:'N_nervous', type:'likert7', label:'今日はそわそわして落ち着かなかった', en:'nervous'},
+      {id:'N_upset', type:'likert7', label:'今日は動揺することがあった', en:'upset'},
     ]
   },
   {
     id: 'flow', title: '③ フロー', cite: 'Flow Short Scale (Rheinberg, Vollmeyer & Engeser, 2003) 日本語訳(独自)',
     items: [
-      {id:'F1', type:'likert7', label:'ちょうどよい難しさだと感じた'},
-      {id:'F2', type:'likert7', label:'考えや作業がスムーズに流れるように進んだ'},
-      {id:'F3', type:'likert7', label:'時間が経つのに気づかなかった'},
-      {id:'F4', type:'likert7', label:'集中することに苦労しなかった'},
-      {id:'F5', type:'likert7', label:'頭の中がすっきりしていた'},
-      {id:'F6', type:'likert7', label:'していることに完全に没頭した'},
-      {id:'F7', type:'likert7', label:'適切な考えや動きが自然に出てきた'},
-      {id:'F8', type:'likert7', label:'次に何をすべきか分かっていた'},
-      {id:'F9', type:'likert7', label:'すべてをコントロールできていると感じた'},
-      {id:'F10', type:'likert7', label:'我を忘れるほど何かに没頭した'},
+      {id:'F1', type:'likert7', label:'ちょうどよい難しさだと感じた', en:'I feel just the right amount of challenge.'},
+      {id:'F2', type:'likert7', label:'考えや作業がスムーズに流れるように進んだ', en:'My thoughts/activities run fluidly and smoothly.'},
+      {id:'F3', type:'likert7', label:'時間が経つのに気づかなかった', en:"I don't notice time passing."},
+      {id:'F4', type:'likert7', label:'集中することに苦労しなかった', en:'I have no difficulty concentrating.'},
+      {id:'F5', type:'likert7', label:'頭の中がすっきりしていた', en:'My mind is completely clear.'},
+      {id:'F6', type:'likert7', label:'していることに完全に没頭した', en:'I am totally absorbed in what I am doing.'},
+      {id:'F7', type:'likert7', label:'適切な考えや動きが自然に出てきた', en:'The right thoughts/movements occur of their own accord.'},
+      {id:'F8', type:'likert7', label:'次に何をすべきか分かっていた', en:'I know what I have to do each step of the way.'},
+      {id:'F9', type:'likert7', label:'すべてをコントロールできていると感じた', en:'I feel that I have everything under control.'},
+      {id:'F10', type:'likert7', label:'我を忘れるほど何かに没頭した', en:'I am completely lost in thought.'},
     ]
   },
   {
-    id: 'curiosity', title: '④ 好奇心', cite: '5DCR (Kashdan, Disabato, Goodman & McKnight, 2020) より3下位尺度・日本語訳(独自)',
+    id: 'meaning', title: '④ 今日の意味・充実', cite: 'M1のみMLQ Presence下位尺度(Steger et al., 2006)の日次翻案。M2・M3はユーザー独自案(検証済み尺度の出典なし)',
     items: [
-      {id:'JE1', type:'likert7', label:'今日は挑戦的な状況を成長の機会だと捉えた'},
-      {id:'JE2', type:'likert7', label:'今日は何かについて深く考える状況を自分から求めた'},
-      {id:'JE3', type:'likert7', label:'今日はなじみのないことについて知るのを楽しんだ'},
-      {id:'JE4', type:'likert7', label:'今日は新しい情報を知ることに面白さを感じた'},
-      {id:'DS1', type:'likert7', label:'今日は難しい問題の解決策を考えていて気になった'},
-      {id:'DS2', type:'likert7', label:'今日は答えが分かるまで休めず何時間もかけて考え込んだ'},
-      {id:'DS3', type:'likert7', label:'今日は問題が解けずに悔しくて、もっと頑張って取り組んだ'},
-      {id:'DS4', type:'likert7', label:'今日は解決しなければと感じた問題にしつこく取り組んだ'},
-      {id:'SCG1', type:'likert7', label:'今日は人がなぜそのように振る舞うのか知りたくなった'},
-      {id:'SCG2', type:'likert7', label:'今日は周りの人が何に興味を持っているのか知りたくて質問した'},
-      {id:'SCG3', type:'likert7', label:'今日は興奮している人と話すとき、その理由を知りたくなった'},
-      {id:'SCG4', type:'likert7', label:'今日は誰かと話すとき、その人について面白い詳細を知ろうとした'},
-    ]
-  },
-  {
-    id: 'meaning', title: '⑤ 今日の意味・充実', cite: 'MLQ Presence下位尺度 (Steger et al., 2006 / 浦田, 2019) 日次形式',
-    items: [
-      {id:'M1', type:'likert7', label:'今日は意味のある一日だった'},
+      {id:'M1', type:'likert7', label:'今日は意味のある一日だった', en:'My life has a clear sense of purpose. (MLQ Presence, day-adapted)'},
       {id:'M2', type:'likert7', label:'今日は充実した一日だった'},
       {id:'M3', type:'likert7', label:'今日は自分らしく過ごせた'},
     ]
   },
   {
-    id: 'covariate', title: '⑥ 共変量', cite: 'Apple Watchでは取得できない単項目指標',
+    id: 'covariate', title: '⑤ 共変量', cite: 'Apple Watchでは取得できない単項目指標(独自設計、検証済み尺度の出典なし)',
     items: [
       {id:'stress', type:'likert7', label:'ストレスを感じた'},
       {id:'fatigue', type:'likert7', label:'疲れていた'},
@@ -211,7 +195,7 @@ const SECTIONS = [
     ]
   },
   {
-    id: 'extra', title: '⑦ Watchで測れない追加項目', cite: '行動と主観体験をつなぐ独自項目',
+    id: 'extra', title: '⑥ Watchで測れない追加項目', cite: '行動と主観体験をつなぐ独自項目(検証済み尺度の出典なし)',
     items: [
       {id:'talked_count', type:'choice', label:'今日、誰かと話した回数', options:['0回','1〜2回','3〜4回','5回以上']},
       {id:'went_out', type:'yn', label:'外出した'},
@@ -226,8 +210,7 @@ const CITES = [
   ['主観的活力','Ryan, R. M., & Frederick, C. (1997). On energy, personality, and health: Subjective vitality as a dynamic reflection of well-being. Journal of Personality, 65(3), 529–565.'],
   ['感情(I-PANAS-SF)','Thompson, E. R. (2007). Development and validation of an internationally reliable short-form of the Positive and Negative Affect Schedule (PANAS). Journal of Cross-Cultural Psychology, 38(2), 227–242.'],
   ['フロー','Rheinberg, F., Vollmeyer, R., & Engeser, S. (2003). Die Erfassung des Flow-Erlebens [Measuring flow experience]. In J. Stiensmeier-Pelster & F. Rheinberg (Eds.), Diagnostik von Motivation und Selbstkonzept.'],
-  ['好奇心(5DCR)','Kashdan, T. B., Disabato, D. J., Goodman, F. R., & McKnight, P. E. (2020). The Five-Dimensional Curiosity Scale Revised (5DCR). Personality and Individual Differences, 157, 109836. (項目文言はGrüning & Lechner, 2022によるGESIS ZIS掲載版, CC-BY 4.0経由で確認)'],
-  ['今日の意味','Steger, M. F., Frazier, P., Oishi, S., & Kaler, M. (2006). The meaning in life questionnaire. Journal of Counseling Psychology, 53(1), 80–93. 日本人成人での使用: 浦田 (2019). Journal of Health Psychology Research, 32(1).'],
+  ['今日の意味(M1のみ)','Steger, M. F., Frazier, P., Oishi, S., & Kaler, M. (2006). The meaning in life questionnaire. Journal of Counseling Psychology, 53(1), 80–93. M2・M3はユーザー独自案で本文献に基づかない。'],
 ];
 
 let historyChart = null;
@@ -298,7 +281,8 @@ function renderItem(item){
     });
     control = `<div class="choices">${btns}</div>`;
   }
-  return `<div class="item"><label>${item.label}</label>${control}</div>`;
+  const enLine = item.en ? `<div class="en-original">EN: ${item.en}</div>` : '';
+  return `<div class="item"><label>${item.label}</label>${enLine}${control}</div>`;
 }
 
 function attachHandlers(){
