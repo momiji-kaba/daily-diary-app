@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>デイリーダイアリー | Apple Watch連携 自由研究</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#1a1d27; --card2:#22273370; --text:#eef0f5; --sub:#9aa1b2;
+    --accent:#6c8cff; --accent2:#9b7dff; --good:#4cd39a; --bad:#ff6b81; --line:#2a2f3d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
+    background:linear-gradient(180deg,#0f1117,#151826); color:var(--text); min-height:100vh;
+    padding-bottom:80px;
+  }
+  header{
+    position:sticky; top:0; z-index:10; backdrop-filter:blur(10px);
+    background:rgba(15,17,23,0.85); padding:16px 18px 12px; border-bottom:1px solid var(--line);
+  }
+  header h1{margin:0; font-size:17px; font-weight:700;}
+  header .date{color:var(--sub); font-size:13px; margin-top:2px;}
+  .tabs{display:flex; gap:8px; margin-top:12px; overflow-x:auto;}
+  .tab{
+    flex:0 0 auto; padding:7px 14px; border-radius:20px; background:var(--card);
+    color:var(--sub); font-size:13px; border:1px solid var(--line); cursor:pointer; white-space:nowrap;
+  }
+  .tab.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+  main{max-width:520px; margin:0 auto; padding:18px 16px;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:18px 16px; margin-bottom:14px;
+  }
+  .section-title{font-size:14px; font-weight:700; color:var(--accent); margin-bottom:2px;}
+  .section-sub{font-size:11px; color:var(--sub); margin-bottom:14px; line-height:1.5;}
+  .item{margin-bottom:18px;}
+  .item:last-child{margin-bottom:0;}
+  .item label{display:block; font-size:14px; margin-bottom:8px; line-height:1.5;}
+  .likert{display:flex; gap:6px; justify-content:space-between;}
+  .likert button{
+    flex:1; aspect-ratio:1; border-radius:50%; border:1px solid var(--line);
+    background:#232838; color:var(--text); font-size:13px; font-weight:600; cursor:pointer;
+    transition:transform .1s;
+  }
+  .likert button.sel{background:var(--accent); border-color:var(--accent); color:#fff; transform:scale(1.08);}
+  .likert-labels{display:flex; justify-content:space-between; font-size:10px; color:var(--sub); margin-top:4px;}
+  .choices{display:flex; gap:8px; flex-wrap:wrap;}
+  .choices button{
+    padding:9px 16px; border-radius:12px; border:1px solid var(--line);
+    background:#232838; color:var(--text); font-size:13px; cursor:pointer;
+  }
+  .choices button.sel{background:var(--accent2); border-color:var(--accent2); color:#fff;}
+  input[type=number]{
+    width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+    background:#232838; color:var(--text); font-size:15px;
+  }
+  .footer-bar{
+    position:fixed; bottom:0; left:0; right:0; padding:12px 16px 18px;
+    background:linear-gradient(0deg,#0f1117 60%,transparent); display:flex; gap:10px;
+  }
+  .footer-bar button{
+    flex:1; padding:14px; border-radius:14px; border:none; font-size:15px; font-weight:700; cursor:pointer;
+  }
+  .btn-save{background:var(--accent); color:#fff;}
+  .btn-save.done{background:var(--good);}
+  .progress{font-size:12px; color:var(--sub); text-align:center; margin-bottom:8px;}
+  .history-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--line); font-size:13px;
+  }
+  .history-item:last-child{border-bottom:none;}
+  .streak{
+    display:flex; gap:14px; margin-bottom:14px;
+  }
+  .streak .box{flex:1; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; text-align:center;}
+  .streak .num{font-size:24px; font-weight:800; color:var(--accent);}
+  .streak .lbl{font-size:11px; color:var(--sub); margin-top:2px;}
+  .export-btn{
+    width:100%; padding:14px; border-radius:14px; border:1px solid var(--accent);
+    background:transparent; color:var(--accent); font-size:14px; font-weight:700; margin-top:6px; cursor:pointer;
+  }
+  .cite{font-size:11px; color:var(--sub); line-height:1.7; margin-bottom:10px;}
+  .cite b{color:var(--text);}
+  .toggle-row{display:flex; justify-content:space-between; align-items:center; padding:10px 0;}
+  .switch{width:44px; height:26px; background:#232838; border-radius:13px; position:relative; cursor:pointer; border:1px solid var(--line);}
+  .switch.on{background:var(--accent);}
+  .switch .knob{position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#fff; transition:.15s;}
+  .switch.on .knob{left:20px;}
+  .empty{text-align:center; color:var(--sub); font-size:13px; padding:30px 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🕊️ デイリーダイアリー</h1>
+  <div class="date" id="todayLabel"></div>
+  <div class="tabs">
+    <div class="tab active" data-tab="today">今日の記録</div>
+    <div class="tab" data-tab="history">履歴・出力</div>
+    <div class="tab" data-tab="about">尺度について</div>
+  </div>
+</header>
+
+<main>
+  <div id="view-today"></div>
+  <div id="view-history" style="display:none"></div>
+  <div id="view-about" style="display:none"></div>
+</main>
+
+<div class="footer-bar" id="footerBar">
+  <button class="btn-save" id="saveBtn">今日の記録を保存</button>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'diary_';
+const SETTINGS_KEY = 'diary_settings';
+
+function todayKey(d){
+  const dt = d || new Date();
+  const y = dt.getFullYear(), m = String(dt.getMonth()+1).padStart(2,'0'), day = String(dt.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function getSettings(){
+  try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; } catch(e){ return {}; }
+}
+function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+
+// ---- Item schema ----
+// type: likert7 | likert5 | yn | num | choice
+const SECTIONS = [
+  {
+    id: 'vitality', title: '① 主観的活力', cite: 'Subjective Vitality Scale (Ryan & Frederick, 1997) state版',
+    items: [
+      {id:'V1', type:'likert7', label:'今日は活力に満ちていると感じた'},
+      {id:'V2', type:'likert7', label:'今日はエネルギーが湧いていると感じた'},
+      {id:'V3', type:'likert7', label:'今日は生き生きしていると感じた'},
+      {id:'V4', type:'likert7', label:'今日は元気が出なかった', reverse:true},
+    ]
+  },
+  {
+    id: 'affect', title: '② 感情', cite: 'I-PANAS-SF (Thompson, 2007) 日本語訳(独自)',
+    items: [
+      {id:'P_active', type:'likert7', label:'今日は活発だと感じた'},
+      {id:'P_alert', type:'likert7', label:'今日ははきはきしていた'},
+      {id:'P_attentive', type:'likert7', label:'今日は注意深く物事に取り組めた'},
+      {id:'P_determined', type:'likert7', label:'今日は意志が強く物事に取り組めた'},
+      {id:'P_inspired', type:'likert7', label:'今日は何かひらめきを感じた'},
+      {id:'N_afraid', type:'likert7', label:'今日は怖いと感じた'},
+      {id:'N_ashamed', type:'likert7', label:'今日は恥ずかしいと感じた'},
+      {id:'N_hostile', type:'likert7', label:'今日は敵意を感じた'},
+      {id:'N_nervous', type:'likert7', label:'今日はそわそわして落ち着かなかった'},
+      {id:'N_upset', type:'likert7', label:'今日は動揺することがあった'},
+    ]
+  },
+  {
+    id: 'flow', title: '③ フロー', cite: 'Flow Short Scale (Rheinberg, Vollmeyer & Engeser, 2003) 日本語訳(独自)',
+    items: [
+      {id:'F1', type:'likert7', label:'ちょうどよい難しさだと感じた'},
+      {id:'F2', type:'likert7', label:'考えや作業がスムーズに流れるように進んだ'},
+      {id:'F3', type:'likert7', label:'時間が経つのに気づかなかった'},
+      {id:'F4', type:'likert7', label:'集中することに苦労しなかった'},
+      {id:'F5', type:'likert7', label:'頭の中がすっきりしていた'},
+      {id:'F6', type:'likert7', label:'していることに完全に没頭した'},
+      {id:'F7', type:'likert7', label:'適切な考えや動きが自然に出てきた'},
+      {id:'F8', type:'likert7', label:'次に何をすべきか分かっていた'},
+      {id:'F9', type:'likert7', label:'すべてをコントロールできていると感じた'},
+      {id:'F10', type:'likert7', label:'我を忘れるほど何かに没頭した'},
+    ]
+  },
+  {
+    id: 'curiosity', title: '④ 好奇心', cite: '5DCR (Kashdan, Disabato, Goodman & McKnight, 2020) より3下位尺度・日本語訳(独自)',
+    items: [
+      {id:'JE1', type:'likert7', label:'今日は挑戦的な状況を成長の機会だと捉えた'},
+      {id:'JE2', type:'likert7', label:'今日は何かについて深く考える状況を自分から求めた'},
+      {id:'JE3', type:'likert7', label:'今日はなじみのないことについて知るのを楽しんだ'},
+      {id:'JE4', type:'likert7', label:'今日は新しい情報を知ることに面白さを感じた'},
+      {id:'DS1', type:'likert7', label:'今日は難しい問題の解決策を考えていて気になった'},
+      {id:'DS2', type:'likert7', label:'今日は答えが分かるまで休めず何時間もかけて考え込んだ'},
+      {id:'DS3', type:'likert7', label:'今日は問題が解けずに悔しくて、もっと頑張って取り組んだ'},
+      {id:'DS4', type:'likert7', label:'今日は解決しなければと感じた問題にしつこく取り組んだ'},
+      {id:'SCG1', type:'likert7', label:'今日は人がなぜそのように振る舞うのか知りたくなった'},
+      {id:'SCG2', type:'likert7', label:'今日は周りの人が何に興味を持っているのか知りたくて質問した'},
+      {id:'SCG3', type:'likert7', label:'今日は興奮している人と話すとき、その理由を知りたくなった'},
+      {id:'SCG4', type:'likert7', label:'今日は誰かと話すとき、その人について面白い詳細を知ろうとした'},
+    ]
+  },
+  {
+    id: 'meaning', title: '⑤ 今日の意味・充実', cite: 'MLQ Presence下位尺度 (Steger et al., 2006 / 浦田, 2019) 日次形式',
+    items: [
+      {id:'M1', type:'likert7', label:'今日は意味のある一日だった'},
+      {id:'M2', type:'likert7', label:'今日は充実した一日だった'},
+      {id:'M3', type:'likert7', label:'今日は自分らしく過ごせた'},
+    ]
+  },
+  {
+    id: 'covariate', title: '⑥ 共変量', cite: 'Apple Watchでは取得できない単項目指標',
+    items: [
+      {id:'stress', type:'likert7', label:'ストレスを感じた'},
+      {id:'fatigue', type:'likert7', label:'疲れていた'},
+      {id:'sleep_quality', type:'likert7', label:'睡眠の質は良かった'},
+      {id:'study_hours', type:'num', label:'勉強・仕事をした時間(数値、時間)'},
+      {id:'alcohol', type:'yn', label:'飲酒した'},
+      {id:'caffeine', type:'yn', label:'カフェインを摂取した'},
+      {id:'period', type:'yn', label:'生理中だった', optional:'period'},
+    ]
+  },
+  {
+    id: 'extra', title: '⑦ Watchで測れない追加項目', cite: '行動と主観体験をつなぐ独自項目',
+    items: [
+      {id:'talked_count', type:'choice', label:'今日、誰かと話した回数', options:['0回','1〜2回','3〜4回','5回以上']},
+      {id:'went_out', type:'yn', label:'外出した'},
+      {id:'nature', type:'likert5', label:'今日は自然に触れた'},
+      {id:'new_experience', type:'likert5', label:'今日は新しい経験をした'},
+      {id:'achievement', type:'likert5', label:'今日は達成感を感じた'},
+    ]
+  },
+];
+
+const CITES = [
+  ['主観的活力','Ryan, R. M., & Frederick, C. (1997). On energy, personality, and health: Subjective vitality as a dynamic reflection of well-being. Journal of Personality, 65(3), 529–565.'],
+  ['感情(I-PANAS-SF)','Thompson, E. R. (2007). Development and validation of an internationally reliable short-form of the Positive and Negative Affect Schedule (PANAS). Journal of Cross-Cultural Psychology, 38(2), 227–242.'],
+  ['フロー','Rheinberg, F., Vollmeyer, R., & Engeser, S. (2003). Die Erfassung des Flow-Erlebens [Measuring flow experience]. In J. Stiensmeier-Pelster & F. Rheinberg (Eds.), Diagnostik von Motivation und Selbstkonzept.'],
+  ['好奇心(5DCR)','Kashdan, T. B., Disabato, D. J., Goodman, F. R., & McKnight, P. E. (2020). The Five-Dimensional Curiosity Scale Revised (5DCR). Personality and Individual Differences, 157, 109836. (項目文言はGrüning & Lechner, 2022によるGESIS ZIS掲載版, CC-BY 4.0経由で確認)'],
+  ['今日の意味','Steger, M. F., Frazier, P., Oishi, S., & Kaler, M. (2006). The meaning in life questionnaire. Journal of Counseling Psychology, 53(1), 80–93. 日本人成人での使用: 浦田 (2019). Journal of Health Psychology Research, 32(1).'],
+];
+
+let historyChart = null;
+
+// ---- render today form ----
+function loadEntry(key){
+  try { return JSON.parse(localStorage.getItem(STORAGE_PREFIX + key)) || {}; } catch(e){ return {}; }
+}
+function saveEntry(key, data){
+  localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(data));
+}
+function allEntryKeys(){
+  const keys = [];
+  for (let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if (k.startsWith(STORAGE_PREFIX) && k !== SETTINGS_KEY) keys.push(k.slice(STORAGE_PREFIX.length));
+  }
+  return keys.sort();
+}
+
+let currentData = {};
+
+function renderToday(){
+  const key = todayKey();
+  currentData = loadEntry(key);
+  const settings = getSettings();
+  document.getElementById('todayLabel').textContent = new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
+
+  let html = '';
+  SECTIONS.forEach(sec => {
+    html += `<div class="card"><div class="section-title">${sec.title}</div><div class="section-sub">${sec.cite}</div>`;
+    sec.items.forEach(item => {
+      if (item.optional === 'period' && !settings.periodEnabled) return;
+      html += renderItem(item);
+    });
+    html += `</div>`;
+  });
+  document.getElementById('view-today').innerHTML = html;
+  attachHandlers();
+  updateProgress();
+}
+
+function renderItem(item){
+  let control = '';
+  if (item.type === 'likert7' || item.type === 'likert5'){
+    const n = item.type === 'likert7' ? 7 : 5;
+    let btns = '';
+    for(let i=1;i<=n;i++){
+      const sel = currentData[item.id] === i ? 'sel' : '';
+      btns += `<button data-id="${item.id}" data-val="${i}" class="likert-btn ${sel}">${i}</button>`;
+    }
+    control = `<div class="likert">${btns}</div><div class="likert-labels"><span>低い</span><span>高い</span></div>`;
+  } else if (item.type === 'yn'){
+    const yes = currentData[item.id] === 1 ? 'sel' : '';
+    const no = currentData[item.id] === 0 ? 'sel' : '';
+    control = `<div class="choices">
+      <button data-id="${item.id}" data-val="1" class="choice-btn ${yes}">はい</button>
+      <button data-id="${item.id}" data-val="0" class="choice-btn ${no}">いいえ</button>
+    </div>`;
+  } else if (item.type === 'num'){
+    const v = currentData[item.id] ?? '';
+    control = `<input type="number" min="0" max="24" step="0.5" data-id="${item.id}" class="num-input" value="${v}" placeholder="例: 2.5">`;
+  } else if (item.type === 'choice'){
+    let btns = '';
+    item.options.forEach((opt, idx) => {
+      const sel = currentData[item.id] === idx ? 'sel' : '';
+      btns += `<button data-id="${item.id}" data-val="${idx}" class="choice-btn ${sel}">${opt}</button>`;
+    });
+    control = `<div class="choices">${btns}</div>`;
+  }
+  return `<div class="item"><label>${item.label}</label>${control}</div>`;
+}
+
+function attachHandlers(){
+  document.querySelectorAll('.likert-btn, .choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id, val = Number(btn.dataset.val);
+      currentData[id] = val;
+      document.querySelectorAll(`[data-id="${id}"]`).forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      updateProgress();
+    });
+  });
+  document.querySelectorAll('.num-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      currentData[inp.dataset.id] = inp.value === '' ? null : Number(inp.value);
+      updateProgress();
+    });
+  });
+}
+
+function totalItemCount(){
+  const settings = getSettings();
+  let n = 0;
+  SECTIONS.forEach(sec => sec.items.forEach(item => {
+    if (item.optional === 'period' && !settings.periodEnabled) return;
+    n++;
+  }));
+  return n;
+}
+function answeredCount(){
+  return Object.keys(currentData).filter(k => currentData[k] !== null && currentData[k] !== undefined).length;
+}
+function updateProgress(){
+  const total = totalItemCount(), answered = answeredCount();
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.textContent = `今日の記録を保存 (${answered}/${total})`;
+  saveBtn.classList.remove('done');
+}
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const key = todayKey();
+  saveEntry(key, currentData);
+  syncToSheet(key, currentData);
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '保存しました ✓';
+  btn.classList.add('done');
+  setTimeout(updateProgress, 1500);
+});
+
+// ---- Googleスプレッドシート連携(ベストエフォート、失敗してもローカル保存は成立している) ----
+function syncToSheet(dateKey, data){
+  const url = getSettings().gsheetUrl;
+  if (!url) return;
+  const payload = JSON.stringify({date: dateKey, ...data});
+  fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: payload
+  }).then(() => {
+    setSyncStatus(`最終送信: ${new Date().toLocaleString('ja-JP')}(送信結果はスプレッドシート側で確認してください)`);
+  }).catch(() => {
+    setSyncStatus('送信に失敗しました(通信エラー)。ローカルには保存されています。');
+  });
+}
+function setSyncStatus(text){
+  const s = getSettings();
+  s.lastSyncStatus = text;
+  saveSettings(s);
+  const el = document.getElementById('syncStatus');
+  if (el) el.textContent = text;
+}
+
+// ---- history view ----
+function computeStreak(keys){
+  const set = new Set(keys);
+  let streak = 0;
+  let d = new Date();
+  // if today not yet answered, start counting from yesterday
+  if (!set.has(todayKey(d))) d.setDate(d.getDate()-1);
+  while (set.has(todayKey(d))){
+    streak++;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+function renderHistory(){
+  const keys = allEntryKeys();
+  const streak = computeStreak(keys);
+  let html = `<div class="streak">
+    <div class="box"><div class="num">${keys.length}</div><div class="lbl">総記録日数</div></div>
+    <div class="box"><div class="num">${streak}</div><div class="lbl">連続記録日数</div></div>
+  </div>`;
+
+  html += `<div class="card">
+    <div class="section-title">CSV出力</div>
+    <div class="section-sub">全記録日のraw scoreをCSVで書き出します。逆転項目や下位尺度の集計はR/Python側で行ってください。</div>
+    <button class="export-btn" id="exportBtn">CSVをダウンロード</button>
+  </div>`;
+
+  html += `<div class="card"><div class="section-title">記録一覧</div>`;
+  if (keys.length === 0){
+    html += `<div class="empty">まだ記録がありません</div>`;
+  } else {
+    [...keys].reverse().forEach(k => {
+      const data = loadEntry(k);
+      const n = Object.keys(data).filter(kk => data[kk] !== null && data[kk] !== undefined).length;
+      html += `<div class="history-item"><span>${k}</span><span>${n}項目 回答済み</span></div>`;
+    });
+  }
+  html += `</div>`;
+
+  const settings = getSettings();
+  html += `<div class="card">
+    <div class="section-title">設定</div>
+    <div class="toggle-row">
+      <span>生理の項目を表示する</span>
+      <div class="switch ${settings.periodEnabled ? 'on':''}" id="periodToggle"><div class="knob"></div></div>
+    </div>
+    <div class="item" style="margin-top:6px;">
+      <label>Googleスプレッドシート連携URL(任意)</label>
+      <input type="text" id="gsheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
+        value="${settings.gsheetUrl ? settings.gsheetUrl.replace(/"/g,'&quot;') : ''}"
+        style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:#232838; color:var(--text); font-size:13px;">
+      <div class="section-sub" style="margin-top:8px;">設定すると、保存ボタンを押した際にローカル保存に加えてこのURL(Google Apps Scriptのウェブアプリ)にも自動送信されます。手順は同フォルダの google-apps-script-code.gs を参照してください。</div>
+      <div class="section-sub" id="syncStatus" style="margin-top:6px; color:var(--good);">${settings.lastSyncStatus || '(まだ送信していません)'}</div>
+      <button class="export-btn" id="testSyncBtn" style="margin-top:10px;">接続テスト送信</button>
+    </div>
+  </div>`;
+
+  document.getElementById('view-history').innerHTML = html;
+  document.getElementById('exportBtn').addEventListener('click', exportCSV);
+  document.getElementById('gsheetUrlInput').addEventListener('change', (e) => {
+    const s = getSettings();
+    s.gsheetUrl = e.target.value.trim();
+    saveSettings(s);
+  });
+  document.getElementById('testSyncBtn').addEventListener('click', () => {
+    syncToSheet('TEST-' + todayKey(), {test: 1, note: '接続テスト'});
+  });
+  document.getElementById('periodToggle').addEventListener('click', (e) => {
+    const s = getSettings();
+    s.periodEnabled = !s.periodEnabled;
+    saveSettings(s);
+    e.currentTarget.classList.toggle('on', s.periodEnabled);
+  });
+}
+
+function allItemIds(){
+  const ids = [];
+  SECTIONS.forEach(sec => sec.items.forEach(item => ids.push(item.id)));
+  return ids;
+}
+
+function exportCSV(){
+  const keys = allEntryKeys();
+  const ids = allItemIds();
+  const header = ['date', ...ids];
+  const rows = [header];
+  keys.forEach(k => {
+    const data = loadEntry(k);
+    const row = [k, ...ids.map(id => (data[id] ?? ''))];
+    rows.push(row);
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob(['﻿' + csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `daily_diary_${todayKey()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ---- about view ----
+function renderAbout(){
+  let html = `<div class="card">
+    <div class="section-title">尺度の出典</div>
+    <div class="section-sub">各セクションの質問項目は、以下の先行研究で開発・検証された尺度の日本語版、または英語原典からの独自の日本語訳に基づいています。公式日本語訳が確認できなかった尺度は独自訳である旨を明記しています。</div>`;
+  CITES.forEach(([name, ref]) => {
+    html += `<div class="cite"><b>${name}</b><br>${ref}</div>`;
+  });
+  html += `</div>`;
+  html += `<div class="card">
+    <div class="section-title">運用方法</div>
+    <div class="cite">毎日1回、夜21〜22時頃など活動がほぼ終わった時間帯に「今日は〜」の形式で回答することを想定しています。Apple Watchの睡眠・歩数・運動・心拍・HRV等の客観データと組み合わせて、行動パターンと主観的な活力・フロー・好奇心の関連を検討する自由研究用に設計されています。</div>
+  </div>`;
+  document.getElementById('view-about').innerHTML = html;
+}
+
+// ---- tabs ----
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    document.getElementById('view-today').style.display = target === 'today' ? 'block' : 'none';
+    document.getElementById('view-history').style.display = target === 'history' ? 'block' : 'none';
+    document.getElementById('view-about').style.display = target === 'about' ? 'block' : 'none';
+    document.getElementById('footerBar').style.display = target === 'today' ? 'flex' : 'none';
+    if (target === 'today') renderToday();
+    if (target === 'history') renderHistory();
+    if (target === 'about') renderAbout();
+  });
+});
+
+renderToday();
+</script>
+</body>
+</html>
