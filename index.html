@@ -160,18 +160,13 @@ const SECTIONS = [
     ]
   },
   {
-    id: 'flow', title: '③ フロー', cite: 'Flow Short Scale (Rheinberg, Vollmeyer & Engeser, 2003) 日本語訳(独自)',
+    id: 'flow', title: '③ フロー(集中した活動があった日のみ)', cite: 'Flow Short Scale (Rheinberg et al., 2003)の10項目から3項目(挑戦度・没頭2種)を抜粋。Bartholomeyczik et al. (2024)が日誌/モーメンタリー測定用に3項目短縮版を作成・妥当性確認していることを参考にしたが、本アプリの3項目選定は同論文の項目と厳密には未照合(独自選定・独自訳)。「今日、集中して取り組んだ活動があった」が「はい」の場合のみ、選んだ活動を対象に以下3項目を表示',
     items: [
-      {id:'F1', type:'likert7', label:'ちょうどよい難しさだと感じた', en:'I feel just the right amount of challenge.'},
-      {id:'F2', type:'likert7', label:'考えや作業がスムーズに流れるように進んだ', en:'My thoughts/activities run fluidly and smoothly.'},
-      {id:'F3', type:'likert7', label:'時間が経つのに気づかなかった', en:"I don't notice time passing."},
-      {id:'F4', type:'likert7', label:'集中することに苦労しなかった', en:'I have no difficulty concentrating.'},
-      {id:'F5', type:'likert7', label:'頭の中がすっきりしていた', en:'My mind is completely clear.'},
-      {id:'F6', type:'likert7', label:'していることに完全に没頭した', en:'I am totally absorbed in what I am doing.'},
-      {id:'F7', type:'likert7', label:'適切な考えや動きが自然に出てきた', en:'The right thoughts/movements occur of their own accord.'},
-      {id:'F8', type:'likert7', label:'次に何をすべきか分かっていた', en:'I know what I have to do each step of the way.'},
-      {id:'F9', type:'likert7', label:'すべてをコントロールできていると感じた', en:'I feel that I have everything under control.'},
-      {id:'F10', type:'likert7', label:'我を忘れるほど何かに没頭した', en:'I am completely lost in thought.'},
+      {id:'flow_had_activity', type:'yn', label:'今日、集中して取り組んだ活動があった'},
+      {id:'flow_activity_type', type:'choice', label:'それは何でしたか', options:['勉強','仕事・バイト','スポーツ・運動','趣味・創作','旅行・お出かけ','その他'], dependsOn:{id:'flow_had_activity', value:1}},
+      {id:'F1', type:'likert7', label:'その活動をしていたとき、ちょうどよい難しさだと感じた', en:'I feel just the right amount of challenge. (FSS, day-adapted)', dependsOn:{id:'flow_had_activity', value:1}},
+      {id:'F2', type:'likert7', label:'その活動をしていたとき、考えや作業がスムーズに流れるように進んだ', en:'My thoughts/activities run fluidly and smoothly. (FSS, day-adapted)', dependsOn:{id:'flow_had_activity', value:1}},
+      {id:'F3', type:'likert7', label:'その活動をしていたとき、完全に没頭していた', en:'I am totally absorbed in what I am doing. (FSS, day-adapted)', dependsOn:{id:'flow_had_activity', value:1}},
     ]
   },
   {
@@ -183,10 +178,17 @@ const SECTIONS = [
     ]
   },
   {
-    id: 'covariate', title: '⑤ 共変量', cite: 'Apple Watchでは取得できない単項目指標(独自設計、検証済み尺度の出典なし)',
+    id: 'fatigue', title: '⑤ 疲労感', cite: 'Chalder Fatigue Scale (CFQ-11, Chalder et al., 1993) の身体的疲労下位尺度(7項目)より3項目を抜粋・日次翻案。11項目中の一部抜粋のため下位尺度全体としての心理測定特性は保証されない',
+    items: [
+      {id:'fatigue1', type:'likert7', label:'今日は疲れやすいと感じた', en:'Do you have problems with tiredness? (CFQ-11, day-adapted)'},
+      {id:'fatigue2', type:'likert7', label:'今日は休息が必要だと感じた', en:'Do you need to rest more? (CFQ-11, day-adapted)'},
+      {id:'fatigue3', type:'likert7', label:'今日は気力がわかなかった', en:'Lacking in energy? (CFQ-11, day-adapted)'},
+    ]
+  },
+  {
+    id: 'covariate', title: '⑥ 共変量', cite: 'Apple Watchでは取得できない単項目指標(独自設計、検証済み尺度の出典なし)',
     items: [
       {id:'stress', type:'likert7', label:'ストレスを感じた'},
-      {id:'fatigue', type:'likert7', label:'疲れていた'},
       {id:'sleep_quality', type:'likert7', label:'睡眠の質は良かった'},
       {id:'study_hours', type:'num', label:'勉強・仕事をした時間(数値、時間)'},
       {id:'alcohol', type:'yn', label:'飲酒した'},
@@ -195,13 +197,24 @@ const SECTIONS = [
     ]
   },
   {
-    id: 'extra', title: '⑥ Watchで測れない追加項目', cite: '行動と主観体験をつなぐ独自項目(検証済み尺度の出典なし)',
+    id: 'extra', title: '⑦ Watchで測れない追加項目', cite: '行動と主観体験をつなぐ独自項目(検証済み尺度の出典なし)',
     items: [
       {id:'talked_count', type:'choice', label:'今日、誰かと話した回数', options:['0回','1〜2回','3〜4回','5回以上']},
       {id:'went_out', type:'yn', label:'外出した'},
       {id:'nature', type:'likert5', label:'今日は自然に触れた'},
       {id:'new_experience', type:'likert5', label:'今日は新しい経験をした'},
       {id:'achievement', type:'likert5', label:'今日は達成感を感じた'},
+      {id:'morning_light', type:'yn', label:'今日、起床後30分以内に日光を浴びた(屋外 or 窓際で直接光を浴びる)'},
+      {id:'phone_before_sleep', type:'choice', label:'【昨夜】寝る前にスマホ・PC画面を見ていた時間', options:['0分(見ていない)','30分未満','30分〜1時間','1時間以上']},
+    ]
+  },
+  {
+    id: 'engagement', title: '⑧ 仕事エンゲージメント(バイト日のみ)', cite: 'UWES-3 (Schaufeli, Shimazu, Hakanen, Salanova, & De Witte, 2019) の日次翻案。「今日はバイトがあった」が「はい」の場合のみ以下3項目を表示',
+    items: [
+      {id:'worked_today', type:'yn', label:'今日はバイトがあった'},
+      {id:'UWES1', type:'likert7', label:'今日は仕事をしていて活力を感じた', en:'At my work, I feel bursting with energy. (day-adapted)', dependsOn:{id:'worked_today', value:1}},
+      {id:'UWES2', type:'likert7', label:'今日は仕事に熱意を持って取り組めた', en:'I am enthusiastic about my job. (day-adapted)', dependsOn:{id:'worked_today', value:1}},
+      {id:'UWES3', type:'likert7', label:'今日は仕事に没頭していた', en:'I am immersed in my work. (day-adapted)', dependsOn:{id:'worked_today', value:1}},
     ]
   },
 ];
@@ -209,8 +222,10 @@ const SECTIONS = [
 const CITES = [
   ['主観的活力','Ryan, R. M., & Frederick, C. (1997). On energy, personality, and health: Subjective vitality as a dynamic reflection of well-being. Journal of Personality, 65(3), 529–565.'],
   ['感情(I-PANAS-SF)','Thompson, E. R. (2007). Development and validation of an internationally reliable short-form of the Positive and Negative Affect Schedule (PANAS). Journal of Cross-Cultural Psychology, 38(2), 227–242.'],
-  ['フロー','Rheinberg, F., Vollmeyer, R., & Engeser, S. (2003). Die Erfassung des Flow-Erlebens [Measuring flow experience]. In J. Stiensmeier-Pelster & F. Rheinberg (Eds.), Diagnostik von Motivation und Selbstkonzept.'],
+  ['フロー(3項目抜粋)','Rheinberg, F., Vollmeyer, R., & Engeser, S. (2003). Die Erfassung des Flow-Erlebens [Measuring flow experience]. In J. Stiensmeier-Pelster & F. Rheinberg (Eds.), Diagnostik von Motivation und Selbstkonzept. 10項目中3項目のみ抜粋。日誌/モーメンタリー用の3項目短縮版の存在はBartholomeyczik, K., et al. (2024). Capturing flow experiences in everyday life: A comparison of recall and momentary measurement. Journal of Happiness Studies を参考にしたが、本アプリの項目選定は同論文と厳密には未照合(独自選定)。'],
   ['今日の意味(M1のみ)','Steger, M. F., Frazier, P., Oishi, S., & Kaler, M. (2006). The meaning in life questionnaire. Journal of Counseling Psychology, 53(1), 80–93. M2・M3はユーザー独自案で本文献に基づかない。'],
+  ['疲労感(3項目抜粋)','Chalder, T., Berelowitz, G., Pawlikowska, T., Watts, L., Wessely, S., Wright, D., & Wallace, E. P. (1993). Development of a fatigue scale. Journal of Psychosomatic Research, 37(2), 147–153. 身体的疲労下位尺度(7項目)より3項目のみ抜粋・日次翻案。'],
+  ['仕事エンゲージメント(UWES-3)','Schaufeli, W. B., Shimazu, A., Hakanen, J., Salanova, M., & De Witte, H. (2019). An ultra-short measure for work engagement: The UWES-9 validation across five countries. European Journal of Psychological Assessment, 35(4), 577–591. 3項目版(UWES-3)を日次翻案。'],
 ];
 
 let historyChart = null;
@@ -233,24 +248,40 @@ function allEntryKeys(){
 
 let currentData = {};
 
+function itemVisible(item){
+  const settings = getSettings();
+  if (item.optional === 'period' && !settings.periodEnabled) return false;
+  if (item.dependsOn && currentData[item.dependsOn.id] !== item.dependsOn.value) return false;
+  return true;
+}
+function clearHiddenAnswers(){
+  SECTIONS.forEach(sec => sec.items.forEach(item => {
+    if (!itemVisible(item) && item.id in currentData) delete currentData[item.id];
+  }));
+}
+function buildTodayHTML(){
+  let html = '';
+  SECTIONS.forEach(sec => {
+    const visibleItems = sec.items.filter(itemVisible);
+    if (visibleItems.length === 0) return;
+    html += `<div class="card"><div class="section-title">${sec.title}</div><div class="section-sub">${sec.cite}</div>`;
+    visibleItems.forEach(item => { html += renderItem(item); });
+    html += `</div>`;
+  });
+  return html;
+}
+function refreshToday(){
+  clearHiddenAnswers();
+  document.getElementById('view-today').innerHTML = buildTodayHTML();
+  attachHandlers();
+  updateProgress();
+}
+
 function renderToday(){
   const key = todayKey();
   currentData = loadEntry(key);
-  const settings = getSettings();
   document.getElementById('todayLabel').textContent = new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
-
-  let html = '';
-  SECTIONS.forEach(sec => {
-    html += `<div class="card"><div class="section-title">${sec.title}</div><div class="section-sub">${sec.cite}</div>`;
-    sec.items.forEach(item => {
-      if (item.optional === 'period' && !settings.periodEnabled) return;
-      html += renderItem(item);
-    });
-    html += `</div>`;
-  });
-  document.getElementById('view-today').innerHTML = html;
-  attachHandlers();
-  updateProgress();
+  refreshToday();
 }
 
 function renderItem(item){
@@ -290,9 +321,7 @@ function attachHandlers(){
     btn.addEventListener('click', () => {
       const id = btn.dataset.id, val = Number(btn.dataset.val);
       currentData[id] = val;
-      document.querySelectorAll(`[data-id="${id}"]`).forEach(b => b.classList.remove('sel'));
-      btn.classList.add('sel');
-      updateProgress();
+      refreshToday();
     });
   });
   document.querySelectorAll('.num-input').forEach(inp => {
@@ -304,12 +333,8 @@ function attachHandlers(){
 }
 
 function totalItemCount(){
-  const settings = getSettings();
   let n = 0;
-  SECTIONS.forEach(sec => sec.items.forEach(item => {
-    if (item.optional === 'period' && !settings.periodEnabled) return;
-    n++;
-  }));
+  SECTIONS.forEach(sec => sec.items.forEach(item => { if (itemVisible(item)) n++; }));
   return n;
 }
 function answeredCount(){
@@ -469,7 +494,9 @@ function renderAbout(){
   html += `</div>`;
   html += `<div class="card">
     <div class="section-title">運用方法</div>
-    <div class="cite">毎日1回、夜21〜22時頃など活動がほぼ終わった時間帯に「今日は〜」の形式で回答することを想定しています。Apple Watchの睡眠・歩数・運動・心拍・HRV等の客観データと組み合わせて、行動パターンと主観的な活力・フロー・好奇心の関連を検討する自由研究用に設計されています。</div>
+    <div class="cite">毎日1回、夜21〜22時頃など活動がほぼ終わった時間帯に回答することを想定しています。Apple Watchの睡眠・歩数・運動・心拍・HRV等の客観データと組み合わせて、行動パターンと主観的な活力・フロー・意味・疲労感等の関連を検討する自由研究用に設計されています。</div>
+    <div class="cite" style="margin-top:10px;"><b>回答時点の注意</b><br>大半の項目は「今日」を指しますが、【昨夜】と明記した項目(寝る前のスマホ使用等)は回答時点でまだ起きていない今夜ではなく、前の晩の行動を指します。既存の「睡眠の質」項目も同様に前の晩の睡眠を指す設計です。分析時は「前夜の行動→前夜の睡眠(Watch客観データ)→今朝の光曝露→今日の心理状態」という時系列の対応関係に注意してください。</div>
+    <div class="cite" style="margin-top:10px;"><b>条件付き項目について</b><br>フロー(集中した活動があった日のみ、対象活動を選んでから回答)と仕事エンゲージメント(バイトがあった日のみ)は、該当しない日は項目自体が表示されず、CSV上は空欄になります(0点ではなく欠測として扱ってください)。</div>
   </div>`;
   document.getElementById('view-about').innerHTML = html;
 }
